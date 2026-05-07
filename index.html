@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GREEN-API Demo</title>
+  <meta
+    name="description"
+    content="Тестовая HTML-страница для вызова методов GREEN-API: getSettings, getStateInstance, sendMessage и sendFileByUrl."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">GREEN-API Test Task</p>
+        <h1>Управление инстансом и отправкой сообщений</h1>
+        <p class="hero-copy">
+          Подключите ваш инстанс, получите его настройки и состояние, затем отправьте текстовое сообщение
+          или файл по URL. Ответ каждого метода отображается справа в режиме только для чтения.
+        </p>
+      </div>
+      <div class="hero-badge" id="connectionBadge">Не подключено</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel panel-controls" aria-label="Панель управления GREEN-API">
+        <div class="section-title">
+          <h2>Параметры подключения</h2>
+          <p>Введите данные из консоли GREEN-API.</p>
+        </div>
+
+        <form class="card form-card" id="credentialsForm" novalidate>
+          <label class="field">
+            <span>ID Instance</span>
+            <input
+              id="idInstance"
+              name="idInstance"
+              type="text"
+              inputmode="numeric"
+              placeholder="1101000001"
+              autocomplete="off"
+              required
+            >
+          </label>
+
+          <label class="field">
+            <span>ApiTokenInstance</span>
+            <input
+              id="apiTokenInstance"
+              name="apiTokenInstance"
+              type="password"
+              placeholder="Введите токен инстанса"
+              autocomplete="off"
+              required
+            >
+          </label>
+
+          <details class="advanced-settings">
+            <summary>Дополнительные параметры</summary>
+            <label class="field">
+              <span>API URL</span>
+              <input
+                id="apiUrl"
+                name="apiUrl"
+                type="url"
+                placeholder="https://api.green-api.com"
+                autocomplete="off"
+              >
+            </label>
+            <p class="hint">
+              Адрес API подбирается автоматически. При необходимости можно указать ваш `apiUrl`
+              из личного кабинета вручную.
+            </p>
+          </details>
+        </form>
+
+        <div class="method-grid">
+          <section class="card method-card">
+            <div class="method-head">
+              <h3>getSettings</h3>
+              <p>Получить текущие настройки инстанса.</p>
+            </div>
+            <button class="action-button" data-action="getSettings" type="button">
+              Выполнить getSettings
+            </button>
+          </section>
+
+          <section class="card method-card">
+            <div class="method-head">
+              <h3>getStateInstance</h3>
+              <p>Проверить текущее состояние инстанса.</p>
+            </div>
+            <button class="action-button" data-action="getStateInstance" type="button">
+              Выполнить getStateInstance
+            </button>
+          </section>
+
+          <section class="card method-card">
+            <div class="method-head">
+              <h3>sendMessage</h3>
+              <p>Отправить текстовое сообщение в личный чат или группу.</p>
+            </div>
+
+            <form class="stacked-form" id="sendMessageForm" novalidate>
+              <label class="field">
+                <span>Телефон / chatId</span>
+                <input
+                  id="messageChatId"
+                  name="chatId"
+                  type="text"
+                  placeholder="77001234567 или 77001234567@c.us"
+                  autocomplete="off"
+                  required
+                >
+              </label>
+
+              <label class="field">
+                <span>Текст сообщения</span>
+                <textarea
+                  id="messageText"
+                  name="message"
+                  rows="4"
+                  maxlength="20000"
+                  placeholder="Здравствуйте! Это тестовое сообщение через GREEN-API."
+                  required
+                ></textarea>
+              </label>
+
+              <p class="hint">
+                Поддерживаются личные и групповые чаты. Максимальная длина текста: `20000` символов.
+              </p>
+
+              <details class="advanced-settings">
+                <summary>Расширенные параметры sendMessage</summary>
+
+                <label class="field">
+                  <span>quotedMessageId</span>
+                  <input
+                    id="quotedMessageId"
+                    name="quotedMessageId"
+                    type="text"
+                    placeholder="Идентификатор сообщения для цитирования"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field field-checkbox">
+                  <input
+                    id="linkPreview"
+                    name="linkPreview"
+                    type="checkbox"
+                    checked
+                  >
+                  <span>Показывать превью ссылок</span>
+                </label>
+
+                <label class="field">
+                  <span>Размер превью</span>
+                  <select id="typePreview" name="typePreview">
+                    <option value="">По умолчанию</option>
+                    <option value="large">large</option>
+                    <option value="small">small</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>typingTime (мс)</span>
+                  <input
+                    id="typingTime"
+                    name="typingTime"
+                    type="number"
+                    min="1000"
+                    max="20000"
+                    step="1000"
+                    placeholder="1000 - 20000"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <div class="subsection-title">customPreview</div>
+
+                <label class="field">
+                  <span>Заголовок превью</span>
+                  <input
+                    id="customPreviewTitle"
+                    name="customPreviewTitle"
+                    type="text"
+                    maxlength="300"
+                    placeholder="Пользовательское превью"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>Описание превью</span>
+                  <input
+                    id="customPreviewDescription"
+                    name="customPreviewDescription"
+                    type="text"
+                    maxlength="300"
+                    placeholder="Краткое описание"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>Ссылка в превью</span>
+                  <input
+                    id="customPreviewLink"
+                    name="customPreviewLink"
+                    type="url"
+                    maxlength="300"
+                    placeholder="https://green-api.com"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>urlFile для большого превью</span>
+                  <input
+                    id="customPreviewUrlFile"
+                    name="customPreviewUrlFile"
+                    type="url"
+                    placeholder="https://example.com/preview.jpg"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>jpegThumbnail для маленького превью</span>
+                  <textarea
+                    id="customPreviewJpegThumbnail"
+                    name="customPreviewJpegThumbnail"
+                    rows="3"
+                    placeholder="Base64-строка jpeg thumbnail"
+                  ></textarea>
+                </label>
+              </details>
+
+              <button class="action-button" data-action="sendMessage" type="submit">
+                Отправить сообщение
+              </button>
+            </form>
+          </section>
+
+          <section class="card method-card">
+            <div class="method-head">
+              <h3>sendFileByUrl</h3>
+              <p>Отправить файл по прямой ссылке.</p>
+            </div>
+
+            <form class="stacked-form" id="sendFileForm" novalidate>
+              <label class="field">
+                <span>Телефон / chatId</span>
+                <input
+                  id="fileChatId"
+                  name="chatId"
+                  type="text"
+                  placeholder="77001234567 или 77001234567@c.us"
+                  autocomplete="off"
+                  required
+                >
+              </label>
+
+              <label class="field">
+                <span>URL файла</span>
+                <input
+                  id="urlFile"
+                  name="urlFile"
+                  type="url"
+                  placeholder="https://example.com/files/report.pdf"
+                  autocomplete="off"
+                  required
+                >
+              </label>
+
+              <label class="field">
+                <span>Имя файла</span>
+                <input
+                  id="fileName"
+                  name="fileName"
+                  type="text"
+                  placeholder="report.pdf"
+                  autocomplete="off"
+                  required
+                >
+              </label>
+
+              <label class="field">
+                <span>Подпись к файлу</span>
+                <textarea
+                  id="caption"
+                  name="caption"
+                  rows="3"
+                  maxlength="20000"
+                  placeholder="Документ отправлен через GREEN-API."
+                ></textarea>
+              </label>
+
+              <p class="hint">
+                Используйте прямую ссылку на файл. `fileName` должен содержать расширение, а `caption` может быть длиной до `20000` символов.
+              </p>
+
+              <details class="advanced-settings">
+                <summary>Расширенные параметры sendFileByUrl</summary>
+
+                <label class="field">
+                  <span>quotedMessageId</span>
+                  <input
+                    id="fileQuotedMessageId"
+                    name="quotedMessageId"
+                    type="text"
+                    placeholder="Идентификатор сообщения для цитирования"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>typingTime (мс)</span>
+                  <input
+                    id="fileTypingTime"
+                    name="typingTime"
+                    type="number"
+                    min="1000"
+                    max="20000"
+                    step="1000"
+                    placeholder="1000 - 20000"
+                    autocomplete="off"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>Тип уведомления набора</span>
+                  <select id="typingType" name="typingType">
+                    <option value="">По умолчанию</option>
+                    <option value="recording">recording</option>
+                  </select>
+                </label>
+              </details>
+
+              <button class="action-button" data-action="sendFileByUrl" type="submit">
+                Отправить файл
+              </button>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <aside class="panel panel-response" aria-label="Ответ API">
+        <div class="response-header">
+          <div class="section-title">
+            <h2>Ответ метода</h2>
+            <p>Поле только для чтения.</p>
+          </div>
+          <button class="ghost-button" id="clearResponseButton" type="button">Очистить</button>
+        </div>
+
+        <div class="response-meta" id="responseMeta">
+          <span>Метод не вызывался</span>
+        </div>
+
+        <textarea
+          id="responseOutput"
+          class="response-output"
+          readonly
+          spellcheck="false"
+          aria-label="Поле ответа API только для чтения"
+        >Ожидание запроса...</textarea>
+      </aside>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
